@@ -156,13 +156,6 @@ useEffect(() => {
       >
         < Background />
         <Controls />
-        {packets.map(packet => (
-        <Packet
-          key={packet.id}
-          x={packet.progress * 300}
-          y={50}
-            />
-          ))}
       </ReactFlow>
     </div>
   );

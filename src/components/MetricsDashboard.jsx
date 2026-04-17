@@ -23,7 +23,7 @@ function MetricsDashboard({ metrics }) {
 
   if (!metrics || metrics.length === 0) {
     return (
-      <div style={{ width: "300px", padding: "20px", background: "#111827", color: "white" }}>
+      <div className="panel" style={{ maxWidth: "100%", padding: "20px", color: "white" }}>
         Run simulation to see metrics
       </div>
     );
@@ -41,7 +41,9 @@ function MetricsDashboard({ metrics }) {
   };
 
   return (
-    <div className="panel">
+    <div className="panel" style={{
+        maxWidth: "100%"
+      }} >
       <h3 style={{ color: "white" }}>System Metrics</h3>
       <Bar data={data} />
     </div>

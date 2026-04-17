@@ -4,7 +4,7 @@ function NodeConfigPanel({ selectedNode, updateNode }) {
 
   if (!selectedNode) {
     return (
-      <div style={{ width: "250px", padding: "20px", background: "#0f172a", color: "white" }}>
+      <div style={{  padding: "20px", background: "#0f172a", color: "white" }}>
         Select a node
       </div>
     );
@@ -15,11 +15,12 @@ function NodeConfigPanel({ selectedNode, updateNode }) {
   };
 
   return (
-    <div style={{ width: "250px", padding: "20px", background: "#0f172a", color: "white" }}>
+    <div className="panel" style={{ maxWidth: "100%", padding: "20px",  color: "white" }}>
 
       <h3>{selectedNode.data.label}</h3>
 
       <label>Capacity</label>
+      <br /><br />
       <input
        type="number"
        value={selectedNode.data.capacity || ""}

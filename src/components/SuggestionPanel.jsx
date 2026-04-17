@@ -29,7 +29,7 @@ function SuggestionPanel({ metrics }) {
   });
 
   return (
-    <div style={{ width: "250px", padding: "20px", background: "#111827", color: "white" }}>
+    <div className="panel" style={{ maxWidth: "100%", padding: "20px", background: "#111827", color: "white" }}>
       <h3>System Suggestions</h3>
 
       {suggestions.length === 0 ? (

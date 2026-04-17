@@ -12,22 +12,14 @@ import Collapsible from "./components/Collapsible";
 function App() {
 
   const [nodes, setNodes] = useState([]);
+  const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [packets, setPackets] = useState([]);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [metrics, setMetrics] = useState([]);
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
   const [edges, setEdges] = useState([]);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [showMobilePanel, setShowMobilePanel] = useState(false);
-
-  useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth < 768);
-  };
-
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  
+  
 
   const updateNode = (id, field, value) => {
     setNodes(nodes =>
@@ -63,7 +55,7 @@ function App() {
 
   const queue = [...sourceNodes];
 
-while (queue.length > 0) {
+  while (queue.length > 0) {
 
   const currentNode = queue.shift();
 
@@ -79,20 +71,36 @@ while (queue.length > 0) {
     if (currentNode.data.type === "LoadBalancer") {
       trafficShare = sourceTraffic / outgoingEdges.length;
     }
+    else if (currentNode.data.type === "Cache") {
+      trafficShare = sourceTraffic * 0.5;
+    }
+
+  
+    else if (currentNode.data.type === "CDN") {
+      trafficShare = sourceTraffic * 0.3;
+    }
+
+    
+    else if (currentNode.data.type === "MessageQueue") {
+      trafficShare = sourceTraffic;
+    }
 
     nodeTraffic[targetNode.id] += trafficShare;
 
     queue.push(targetNode);
-    const newPackets = edges.map(edge => ({
-    id: Math.random(),
-    source: edge.source,
-    target: edge.target,
-    progress: 0
-    }));
+    
 
   });
 
 }
+  const newPackets = edges.map(edge => ({
+    id: Math.random(),
+    source: edge.source,
+    target: edge.target,
+    progress: 0
+  }));
+
+  setPackets(newPackets);
 
   const results = nodes.map(node => {
 
@@ -106,8 +114,17 @@ while (queue.length > 0) {
 
     const load = incomingTraffic / capacity;
 
-    const totalLatency = latency + queued;
+    let totalLatency = latency + queued;
 
+    
+    if (node.data.type === "MessageQueue") {
+      totalLatency += 50;
+    }
+
+  
+    if (node.data.type === "Cache") {
+      totalLatency -= 5;
+    }
     return {
       name: node.data.label,
       load: Number(load.toFixed(2)),
@@ -161,88 +178,42 @@ while (queue.length > 0) {
       setPackets={setPackets}
       setSelectedNodeId={setSelectedNodeId}
       />
-      {isMobile && (
-      <button
-        onClick={() => setShowMobilePanel(true)}
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          right: "20px",
-          zIndex: 20,
-          background: "linear-gradient(135deg,#3b82f6,#6366f1)",
-          border: "none",
-          borderRadius: "50%",
-          width: "50px",
-          height: "50px",
-          fontSize: "20px",
-          color: "white",
-          cursor: "pointer",
-          boxShadow: "0px 6px 20px rgba(0,0,0,0.4)"
-        }}
-      >
-        ⚙
-      </button>
-    )}
-    {isMobile && showMobilePanel && (
-  <div
-    style={{
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      width: "100%",
-      height: "60%",
-      background: "#111827",
-      borderTopLeftRadius: "16px",
-      borderTopRightRadius: "16px",
-      padding: "10px",
-      zIndex: 30,
-      overflowY: "auto"
-    }}
-  >
-
-    <button onClick={() => setShowMobilePanel(false)}>
-      Close
-    </button>
-
-    <Collapsible title="🧩 Selected Node">
-      <NodeConfigPanel
-        selectedNode={selectedNode}
-        updateNode={updateNode}
-      />
-    </Collapsible>
-
-    <Collapsible title="⚙ Simulation">
-      <SimulationPanel runSimulation={runSimulation} />
-    </Collapsible>
-
-    <Collapsible title="📊 Metrics">
-      <MetricsDashboard metrics={metrics} />
-    </Collapsible>
-
-    <Collapsible title="⚠ Alerts">
-      <BottleneckPanel metrics={metrics} />
-    </Collapsible>
-
-    <Collapsible title="💡 Suggestions">
-      <SuggestionPanel metrics={metrics} />
-    </Collapsible>
-
-  </div>
-)}
-
-      {!isMobile && (
-            <div
+     
+      
+      
+      <div
+        className="panel"
         style={{
           position: "absolute",
           top: "20px",
           right: "20px",
-          width: "260px",
+          right: panelCollapsed ? "20px" : "20px",
+          width: panelCollapsed ? "40px" : "260px",
           display: "flex",
           flexDirection: "column",
           gap: "10px",
-          zIndex: 10
+          padding: "10px",
+          zIndex: 10,
+          transition: "0.3s",
+          overflowY: "auto",
+          maxHeight: "93%"
         }}
       >
+        <button
+        onClick={() => setPanelCollapsed(!panelCollapsed)}
+        style={{
+          alignSelf: "flex-end",
+          padding: "10px",
+          width: "40px",
+          right: "10px",
+          margin: "0px"
+          
+        }}
+      >
+        {panelCollapsed ? "⚙️" : "❌"}
+      </button>
+      {!panelCollapsed && (
+      <>
 
         <Collapsible title="🧩 Selected Node">
           <NodeConfigPanel
@@ -266,9 +237,10 @@ while (queue.length > 0) {
         <Collapsible title="💡 Suggestions">
           <SuggestionPanel metrics={metrics} />
         </Collapsible>
-
+       </>
+      )}
       </div>
- )}
+      
     </div>
     
   );

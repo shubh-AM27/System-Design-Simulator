@@ -4,7 +4,7 @@ function SuggestionPanel({ metrics }) {
 
   if (!metrics || metrics.length === 0) {
     return (
-      <div style={{ width: "250px", padding: "20px", background: "#111827", color: "white" }}>
+      <div className="panel" style={{ maxWidth: "100%", padding: "20px", background: "#111827", color: "white" }}>
         Run simulation for suggestions
       </div>
     );

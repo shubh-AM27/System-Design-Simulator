@@ -4,7 +4,7 @@ function NodeConfigPanel({ selectedNode, updateNode }) {
 
   if (!selectedNode) {
     return (
-      <div style={{  padding: "20px", background: "#0f172a", color: "white" }}>
+      <div className="panel" style={{  padding: "20px", background: "#0f172a", color: "white" }}>
         Select a node
       </div>
     );
